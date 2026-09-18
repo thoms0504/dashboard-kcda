@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'Plus Jakarta Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+      --font-body: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+
+      --navy: #0d2142;
+      --navy-800: #123159;
+      --blue: #1d5fd6;
+      --blue-500: #2f6fe0;
+      --blue-light: #eef4ff;
+      --green: #17875a;
+      --green-bg: #e6f6ee;
+      --green-light: #4cbf82;
+      --yellow: #c07a12;
+      --yellow-bg: #fdf3e0;
+      --red: #c0392b;
+      --red-bg: #fdeceb;
+      --gray: #6b7484;
+      --ink: #111827;
+      --ink-soft: #4b5566;
+      --bg: #f5f6fa;
+      --surface: #ffffff;
+      --border: #e4e8ef;
+      --border-soft: #edf1f6;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 2px rgba(13,33,66,.06);
+      --shadow-md: 0 6px 18px rgba(13,33,66,.08);
+      --shadow-lg: 0 20px 44px rgba(9,22,46,.18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: var(--font-body);
+      background: var(--bg); color: var(--ink); font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font-family: inherit; }
+    :focus-visible { outline: 2px solid var(--blue-500); outline-offset: 2px; }
+
+    #app { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    #sidebar {
+      width: 264px; background: linear-gradient(180deg, var(--navy) 0%, #0a1930 100%);
+      color: #fff; display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; }
+    .brand-mark {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--blue-500), var(--navy-800));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,.25);
+    }
+    .brand-text { min-width: 0; }
+    .brand-title { font-family: var(--font-display); font-size: 14.5px; font-weight: 700; line-height: 1.2; }
+    .brand-sub { font-size: 11px; color: #9db2d6; margin-top: 2px; }
+
+    .nav-section { padding: 4px 12px 10px; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px; margin-bottom: 4px; padding: 9px 12px;
+      border-radius: 9px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500;
+      color: #cbd7ec; transition: background .15s ease, color .15s ease;
+    }
+    .nav-btn svg { flex-shrink: 0; opacity: .9; }
+    .nav-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-btn.active { background: var(--blue-500); color: #fff; box-shadow: var(--shadow-sm); }
+
+    #sidebar-search {
+      margin: 2px 16px 10px; padding: 8px 12px; border-radius: 9px; border: 1px solid transparent;
+      font-size: 12.5px; width: calc(100% - 32px); background: rgba(255,255,255,0.08); color: #fff;
+    }
+    #sidebar-search::placeholder { color: #9db2d6; }
+    #sidebar-search:focus { background: rgba(255,255,255,0.14); }
+
+    #kab-list { list-style: none; margin: 0; padding: 0 10px; overflow-y: auto; flex: 1; }
+    #kab-list li {
+      padding: 9px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 2px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      border-left: 3px solid transparent; transition: background .15s ease, border-color .15s ease;
+    }
+    #kab-list li:hover { background: rgba(255,255,255,0.07); }
+    #kab-list li.active { background: rgba(47,111,224,0.22); border-left-color: var(--blue-500); }
+    #kab-list .kab-rank-no { font-size: 10px; font-weight: 700; color: #8497b8; width: 18px; flex-shrink: 0; }
+    #kab-list .kab-name { font-size: 12.5px; line-height: 1.3; color: #e7edf8; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #kab-list .kab-pct { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 20px; color: #fff; flex-shrink: 0; }
+    #sidebar-footer {
+      padding: 12px 18px 16px; font-size: 11px; color: #8497b8; border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Main */
+    #main { flex: 1; padding: 26px 32px; overflow-y: auto; }
+    #main h2 { margin: 0 0 4px; font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--navy); letter-spacing: -.01em; }
+    #main .meta { color: var(--gray); font-size: 13px; margin-bottom: 20px; }
+
+    .cards-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+      position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 18px 15px; min-width: 150px; flex: 1;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .stat-card .num { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--navy); }
+    .stat-card .lbl { font-size: 12px; color: var(--gray); margin-top: 3px; }
+
+    .kab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+    .kab-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; cursor: pointer; transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .kab-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .kab-card .name { font-weight: 600; font-size: 13.5px; margin-bottom: 9px; color: var(--navy); }
+    .bar-bg { background: var(--border-soft); border-radius: 20px; height: 7px; overflow: hidden; margin-bottom: 7px; }
+    .bar-fill { height: 100%; border-radius: 20px; transition: width .3s ease; }
+    .kab-card .foot { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--gray); }
+
+    .barchart { display: flex; flex-direction: column; gap: 9px; }
+    .barchart-row { display: flex; align-items: center; gap: 10px; padding: 3px 4px; border-radius: 7px; }
+    .barchart-row.clickable { cursor: pointer; }
+    .barchart-row.clickable:hover { background: var(--blue-light); }
+    .barchart-rank { font-size: 11px; font-weight: 700; color: var(--gray); width: 18px; flex-shrink: 0; text-align: right; }
+    .barchart-label { font-size: 12px; flex: 0 1 160px; min-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+    .barchart-track { flex: 1; background: var(--border-soft); border-radius: 20px; height: 14px; overflow: hidden; min-width: 60px; }
+    .barchart-fill { height: 100%; border-radius: 20px; transition: width .3s ease; }
+    .barchart-value { font-size: 11.5px; font-weight: 700; width: 42px; flex-shrink: 0; text-align: right; color: var(--navy); }
+
+    /* Detail view */
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tab-btn {
+      display: flex; align-items: center; padding: 6px 13px; border-radius: 20px; background: var(--surface);
+      border: 1px solid var(--border); cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--ink-soft);
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .tab-btn:hover { border-color: var(--blue-500); }
+    .tab-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .tab-btn .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; }
+
+    .kec-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kec-panel .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
+    .kec-panel .head h3 { margin: 0; font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--navy); }
+    .progres-badge { font-weight: 700; font-size: 13.5px; padding: 5px 13px; border-radius: 20px; color: #fff; }
+
+    .aspek-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+    .aspek-item {
+      display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 9px;
+      border: 1px solid var(--border); cursor: pointer; user-select: none; transition: background .15s ease, border-color .15s ease;
+    }
+    .aspek-item:hover { border-color: var(--blue-500); }
+    .aspek-item.done { background: var(--green-bg); border-color: #bfe6d2; }
+    .aspek-item input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue-500); }
+    .aspek-item .lbl { font-size: 12.5px; font-weight: 500; }
+    .aspek-item .date { font-size: 10.5px; color: var(--gray); display: block; margin-top: 1px; }
+
+    .missing-box {
+      margin-top: 16px; padding: 11px 15px; background: var(--yellow-bg); border: 1px solid #f4dfb0;
+      border-radius: 9px; font-size: 12.5px; color: #8a5a15;
+    }
+    .missing-box b { color: #7a4c0d; }
+    .missing-box.empty { background: var(--green-bg); border-color: #bfe6d2; color: #175c3f; }
+
+    #filter-box { margin-bottom: 16px; }
+    #filter-box select {
+      padding: 9px 13px; border-radius: 9px; border: 1px solid var(--border); width: 320px; font-size: 13px;
+      background: var(--surface); color: var(--ink);
+    }
+    #filter-kec-search-box input {
+      padding: 9px 13px; border-radius: 9px; border: 1px solid var(--border); width: 320px; font-size: 13px;
+    }
+    .filter-result { background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 11px 15px; margin-bottom: 8px; cursor: pointer; transition: background .15s ease; }
+    .filter-result:hover { background: var(--blue-light); }
+    .filter-result .kab { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+    #riwayat-search-box input {
+      padding: 9px 13px; border-radius: 9px; border: 1px solid var(--border); width: 320px; font-size: 13px;
+    }
+    .riwayat-date-group { margin-bottom: 22px; }
+    .riwayat-date-head {
+      font-family: var(--font-display); font-size: 12.5px; font-weight: 700; color: var(--navy);
+      text-transform: uppercase; letter-spacing: .03em; margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    }
+    .riwayat-date-count { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: none; letter-spacing: normal; white-space: nowrap; }
+    .riwayat-kec-list { display: flex; flex-direction: column; gap: 8px; }
+    .riwayat-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 11px 15px; cursor: pointer; transition: background .15s ease, border-color .15s ease;
+    }
+    .riwayat-item:hover { background: var(--blue-light); border-color: var(--blue-500); }
+    .riwayat-item-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+    .riwayat-kec-name { font-weight: 600; font-size: 13px; color: var(--ink); }
+    .riwayat-kab-tag { font-weight: 500; font-size: 11px; color: var(--gray); }
+    .riwayat-jam { font-size: 11px; color: var(--gray); flex-shrink: 0; white-space: nowrap; }
+    .riwayat-aspek-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .riwayat-aspek-tag {
+      font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+      background: var(--blue-light); color: var(--blue);
+    }
+
+    .rank-cols { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+    .rank-col { flex: 1; min-width: 260px; }
+    .rank-subtitle { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 6px; letter-spacing: .04em; }
+    .rank-list { display: flex; flex-direction: column; gap: 6px; }
+    .rank-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 11px;
+      border: 1px solid var(--border); border-radius: 9px; cursor: pointer; background: var(--surface);
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .rank-item:hover { background: var(--blue-light); border-color: var(--blue-500); }
+    .rank-no { font-size: 11px; font-weight: 700; color: var(--gray); width: 16px; flex-shrink: 0; }
+    .rank-name { flex: 1; font-size: 12.5px; }
+    .rank-kab { color: var(--gray); font-size: 11px; }
+    .rank-pct { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; color: #fff; flex-shrink: 0; }
+    .rank-pct-inline { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; color: #fff; margin-left: 8px; }
+    .kab-rank-list { display: flex; flex-direction: column; gap: 8px; }
+    .kab-rank-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 17px; }
+    .kab-rank-item summary {
+      cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--navy); list-style: none;
+      display: flex; align-items: center;
+    }
+    .kab-rank-item summary::-webkit-details-marker { display: none; }
+    .kab-rank-item summary:before { content: '▸'; margin-right: 7px; color: var(--gray); font-size: 11px; }
+    .kab-rank-item[open] summary:before { content: '▾'; }
+
+    .aspek-date-input {
+      margin-left: auto; padding: 6px 9px; border-radius: 7px; border: 1px solid var(--border);
+      font-size: 12px; font-family: inherit;
+    }
+
+    /* Login */
+    .login-wrap { min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center; padding: 20px 0; }
+    .login-shell {
+      display: grid; grid-template-columns: 1.05fr 1fr; max-width: 860px; width: 100%;
+      background: var(--surface); border-radius: var(--radius-lg); overflow: hidden;
+      box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+    }
+    .login-aside {
+      position: relative; padding: 40px 36px; color: #fff;
+      background: radial-gradient(120% 140% at 0% 0%, #1a3f75 0%, var(--navy) 45%, #081227 100%);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .login-aside-badge {
+      display: inline-flex; align-self: flex-start; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 11px; border-radius: 20px;
+      background: rgba(255,255,255,0.12); color: #cfe0ff; margin-bottom: 22px;
+    }
+    .login-aside-title { font-family: var(--font-display); font-size: 24px; color: #b7c8e6; line-height: 1.28; font-weight: 700; margin: 0 0 12px;}
+    .login-aside-desc { font-size: 13px; line-height: 1.6; color: #b7c8e6; margin: 0 0 22px; max-width: 320px; }
+    .login-points { list-style: none; margin: 0 0 auto; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+    .login-points li { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: #dbe6fa; }
+    .login-points svg { flex-shrink: 0; color: #6fa1ff; }
+    .login-aside-chart { margin-top: 26px; opacity: .85; }
+
+    .login-form { padding: 40px 38px; display: flex; flex-direction: column; }
+    .login-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--blue-500); text-transform: uppercase; }
+    .login-title { font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--navy); margin: 6px 0 8px; }
+    .login-desc { font-size: 12.5px; color: var(--gray); line-height: 1.55; margin: 0 0 22px; }
+    .login-label { font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; display: block; }
+    .login-input-wrap {
+      display: flex; align-items: center; gap: 9px; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 0 12px; margin-bottom: 16px; transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .login-input-wrap svg { flex-shrink: 0; color: var(--gray); }
+    .login-input-wrap:focus-within { border-color: var(--blue-500); box-shadow: 0 0 0 3px var(--blue-light); }
+    .login-input-wrap input {
+      border: none; outline: none; padding: 11px 0; font-size: 14.5px; flex: 1; min-width: 0; background: transparent;
+      letter-spacing: .02em; color: var(--ink);
+    }
+    .pw-toggle {
+      border: none; background: transparent; padding: 4px; margin: 0; cursor: pointer; flex-shrink: 0;
+      color: var(--gray); display: flex; align-items: center; border-radius: 6px;
+      transition: color .15s ease, background .15s ease;
+    }
+    .pw-toggle:hover { color: var(--blue-500); background: var(--blue-light); }
+
+    .btn-primary {
+      position: relative; border: none; border-radius: 10px; background: var(--blue-500); color: #fff;
+      font-size: 13.5px; font-weight: 600; padding: 12px 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s ease, box-shadow .15s ease, transform .05s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:hover { background: #2557c4; box-shadow: var(--shadow-md); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { cursor: default; opacity: .85; }
+    .btn-spinner {
+      display: none; width: 15px; height: 15px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; animation: spin .7s linear infinite;
+    }
+    .btn-primary.loading .btn-label { opacity: 0; }
+    .btn-primary.loading .btn-spinner { display: inline-block; position: absolute; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .login-error {
+      color: var(--red); font-size: 12.5px; min-height: 14px; margin-top: 11px;
+      opacity: 0; transform: translateY(-3px); transition: opacity .15s ease, transform .15s ease;
+    }
+    .login-error.show { opacity: 1; transform: translateY(0); }
+    .login-hint {
+      margin-top: 20px; padding: 11px 14px; background: var(--blue-light); border: 1px solid #cfe0f8;
+      border-radius: 9px; font-size: 12px; color: var(--navy); line-height: 1.55;
+    }
+    .login-hint code { background: rgba(13,33,66,0.08); padding: 1px 6px; border-radius: 5px; font-size: 11.5px; }
+
+    @media (max-width: 720px) {
+      .login-shell { grid-template-columns: 1fr; }
+      .login-aside { display: none; }
+      .login-form { padding: 32px 24px; }
+    }
+
+    .empty-state { text-align: center; padding: 70px 20px; color: var(--gray); }
+    .empty-state h3 { font-family: var(--font-display); color: var(--navy); margin-bottom: 8px; }
+    .setup-btn {
+      margin-top: 16px; display: inline-block; padding: 10px 20px; background: var(--blue-500);
+      color: #fff; border-radius: 9px; cursor: pointer; border: none; font-size: 13px; font-weight: 600;
+      transition: background .15s ease;
+    }
+    .setup-btn:hover { background: #2557c4; }
+    .loading {
+      text-align: center; padding: 70px; color: var(--gray);
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .loading:before {
+      content: ''; width: 26px; height: 26px; border-radius: 50%;
+      border: 3px solid var(--border); border-top-color: var(--blue-500); animation: spin .8s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V13M10 19V9M16 19V5M3 19h18"/></svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">Dashboard KDA</div>
+          <div class="brand-sub">Kecamatan Dalam Angka &middot; <span id="year-label">2026</span></div>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-btn active" id="nav-overview" onclick="showOverview()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          Ringkasan Provinsi
+        </div>
+        <div class="nav-btn" id="nav-filter" onclick="showFilter()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+          Cari Kecamatan
+        </div>
+        <div class="nav-btn" id="nav-riwayat" onclick="showRiwayat()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Riwayat Aktivitas
+        </div>
+        <div class="nav-btn" id="nav-login" onclick="showLogin()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Login
+        </div>
+      </div>
+      <input id="sidebar-search" placeholder="Cari kab/kota...">
+      <ul id="kab-list"></ul>
+      <div id="sidebar-footer">Klik kab/kota untuk buka checklist per kecamatan.</div>
+    </div>
+    <div id="main">
+      <div class="loading" id="loading">Memuat data...</div>
+    </div>
+  </div>
+
+<script>
+var STATE = {
+  data: null,
+  activeKab: null,
+  activeKecRow: null,
+  view: 'overview',
+  auth: { token: null, role: 'public', kode: null, nama: null }
+};
+var FILTER_STATE = { kode: null };
+var RIWAYAT_STATE = { kode: 'all' };
+
+var ICON_LOCK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+var ICON_UNLOCK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 7.5-2.5"/></svg>';
+
+function iconCheckSm() {
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+}
+function iconKeySm() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.2"/><path d="M10.3 12.7L20 3M15.5 7.5l2.3 2.3M18.2 4.8l2.3 2.3"/></svg>';
+}
+function iconLockSm() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+}
+function iconEyeSm() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
+function iconEyeOffSm() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M6.6 6.6C3.4 8.5 1.5 12 1.5 12S5 19 12 19a10.6 10.6 0 0 0 5.4-1.4M10.6 5.2A10.6 10.6 0 0 1 12 5c7 0 10.5 7 10.5 7a13.9 13.9 0 0 1-3.15 4.15"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+}
+function loginChartDecor() {
+  return '<svg width="150" height="46" viewBox="0 0 150 46" fill="none">' +
+    '<rect x="0" y="26" width="14" height="20" rx="2" fill="rgba(255,255,255,0.14)"/>' +
+    '<rect x="20" y="16" width="14" height="30" rx="2" fill="rgba(255,255,255,0.22)"/>' +
+    '<rect x="40" y="6" width="14" height="40" rx="2" fill="rgba(255,255,255,0.32)"/>' +
+    '<rect x="60" y="20" width="14" height="26" rx="2" fill="rgba(255,255,255,0.2)"/>' +
+    '<rect x="80" y="0" width="14" height="46" rx="2" fill="rgba(111,161,255,0.55)"/>' +
+    '<rect x="100" y="14" width="14" height="32" rx="2" fill="rgba(255,255,255,0.22)"/>' +
+    '<rect x="120" y="24" width="14" height="22" rx="2" fill="rgba(255,255,255,0.14)"/>' +
+    '</svg>';
+}
+
+function colorFor(pct) {
+  if (pct >= 100) return 'var(--green)';
+  if (pct >= 90) return 'var(--green-light)';
+  if (pct >= 60) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function init() {
+  try {
+    var saved = sessionStorage.getItem('kda_auth');
+    if (saved) STATE.auth = JSON.parse(saved);
+  } catch (e) {}
+  loadData();
+}
+
+function loadData() {
+  document.getElementById('main').innerHTML = '<div class="loading" id="loading">Memuat data...</div>';
+  google.script.run.withSuccessHandler(onData).withFailureHandler(onError).getDashboardData(STATE.auth.token);
+}
+
+function onError(err) {
+  var msg = (err && err.message) || String(err);
+  document.getElementById('main').innerHTML =
+    '<div class="empty-state"><h3>Terjadi kesalahan</h3><p>' + msg + '</p>' +
+    '<button class="setup-btn" onclick="doLogout()">Muat Ulang</button></div>';
+}
+
+function onData(data) {
+  STATE.data = data;
+  document.getElementById('year-label').textContent = data.year;
+
+  if (data.needsSetup) {
+    document.getElementById('main').innerHTML =
+      '<div class="empty-state"><h3>Sheet tahun ' + data.year + ' belum dibuat</h3>' +
+      '<p>Jalankan menu <b>Dashboard KDA &gt; 1. Setup Sheet Tahun ' + data.year + '</b> di Google Sheets, lalu muat ulang halaman ini.</p></div>';
+    return;
+  }
+
+  updateSidebarChrome();
+
+  if (data.role === 'kabkota' && data.kabupaten.length) {
+    openKab(data.kabupaten[0].kode);
+  } else if (data.role === 'admin' && STATE.pendingKab) {
+    var target = STATE.pendingKab;
+    STATE.pendingKab = null;
+    openKab(target.kode, target.row);
+  } else {
+    showOverview();
+  }
+
+  var searchInput = document.getElementById('sidebar-search');
+  searchInput.oninput = function (e) {
+    renderSidebar(e.target.value.toLowerCase());
+  };
+}
+
+/**
+ * Menyesuaikan tampilan sidebar (menu, kotak cari, daftar kab/kota, teks status
+ * login) sesuai peran yang sedang aktif: public / kabkota / admin.
+ */
+function updateSidebarChrome() {
+  var role = STATE.data.role;
+  var navFilter = document.getElementById('nav-filter');
+  var navRiwayat = document.getElementById('nav-riwayat');
+  var navLogin = document.getElementById('nav-login');
+  var searchInput = document.getElementById('sidebar-search');
+  var kabList = document.getElementById('kab-list');
+  var footer = document.getElementById('sidebar-footer');
+
+  if (role === 'kabkota' || role === 'admin') {
+    navLogin.innerHTML = ICON_UNLOCK + ' Logout';
+    navLogin.onclick = doLogout;
+  } else {
+    navLogin.innerHTML = ICON_LOCK + ' Login';
+    navLogin.onclick = function () { showLogin(); };
+  }
+
+  if (role === 'public') {
+    navFilter.style.display = 'none';
+    navRiwayat.style.display = 'none';
+    searchInput.style.display = 'none';
+    kabList.style.display = 'none';
+    footer.textContent = 'Login untuk melihat daftar kab/kota di sini dan mengisi checklist.';
+  } else if (role === 'kabkota') {
+    navFilter.style.display = '';
+    navRiwayat.style.display = '';
+    searchInput.style.display = 'none';
+    kabList.style.display = '';
+    footer.textContent = 'Login sebagai: ' + STATE.data.nama + ' (' + STATE.data.kode + ')';
+  } else {
+    navFilter.style.display = '';
+    navRiwayat.style.display = '';
+    searchInput.style.display = '';
+    kabList.style.display = '';
+    footer.textContent = 'Login sebagai: Admin Provinsi';
+  }
+}
+
+/* ===================== Login ===================== */
+function showLogin(hint) {
+  STATE.view = 'login';
+  setNav('');
+  document.getElementById('main').innerHTML =
+    '<div class="login-wrap">' +
+      '<div class="login-shell">' +
+        '<div class="login-aside">' +
+          '<div class="login-aside-badge">KDA ' + (STATE.data ? STATE.data.year : '2026') + '</div>' +
+          '<h2 class="login-aside-title">Portal Monitoring<br>Kecamatan Dalam Angka</h2>' +
+          '<p class="login-aside-desc">Pantau dan perbarui progres penyusunan publikasi Kecamatan Dalam Angka di seluruh kabupaten/kota.</p>' +
+          '<ul class="login-points">' +
+            '<li>' + iconCheckSm() + ' Checklist 10 aspek per kecamatan</li>' +
+            '<li>' + iconCheckSm() + ' Progres terhitung otomatis &amp; real-time</li>' +
+            '<li>' + iconCheckSm() + ' Akses berjenjang: admin provinsi &amp; kab/kota</li>' +
+          '</ul>' +
+          '<div class="login-aside-chart" aria-hidden="true">' + loginChartDecor() + '</div>' +
+        '</div>' +
+        '<div class="login-form">' +
+          '<span class="login-eyebrow">Masuk ke Dashboard</span>' +
+          '<h3 class="login-title">Login Wilayah</h3>' +
+          '<p class="login-desc">' + (hint || 'Masukkan kode akses dan password untuk melihat detail dan mengisi checklist wilayah Anda.') + '</p>' +
+          '<label class="login-label" for="login-code">Kode akses</label>' +
+          '<div class="login-input-wrap">' +
+            iconKeySm() +
+            '<input id="login-code" type="text" placeholder="Contoh: 1801" autocomplete="username" autocapitalize="off" spellcheck="false">' +
+          '</div>' +
+          '<label class="login-label" for="login-password">Password</label>' +
+          '<div class="login-input-wrap">' +
+            iconLockSm() +
+            '<input id="login-password" type="password" placeholder="Masukkan password" autocomplete="current-password">' +
+            '<button type="button" id="pw-toggle-btn" class="pw-toggle" aria-label="Tampilkan password" onclick="togglePasswordVisibility()">' + iconEyeSm() + '</button>' +
+          '</div>' +
+          '<button class="btn-primary" id="login-submit" onclick="doLogin()">' +
+            '<span class="btn-label">Masuk</span>' +
+            '<span class="btn-spinner" aria-hidden="true"></span>' +
+          '</button>' +
+          '<div id="login-error" class="login-error" role="alert"></div>' +
+          '<div class="login-hint"><b>Catatan:</b> Kode akses adalah 4 digit kode kabupaten/kota (mis. <code>1801</code>) atau kode khusus admin. Password akses diinformasikan oleh admin provinsi.</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var codeInput = document.getElementById('login-code');
+  var passInput = document.getElementById('login-password');
+  codeInput.focus();
+  function submitOnEnter(e) { if (e.key === 'Enter') doLogin(); }
+  codeInput.addEventListener('keydown', submitOnEnter);
+  passInput.addEventListener('keydown', submitOnEnter);
+}
+
+function togglePasswordVisibility() {
+  var input = document.getElementById('login-password');
+  var btn = document.getElementById('pw-toggle-btn');
+  if (!input || !btn) return;
+  var showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.innerHTML = showing ? iconEyeSm() : iconEyeOffSm();
+  btn.setAttribute('aria-label', showing ? 'Tampilkan password' : 'Sembunyikan password');
+}
+
+function doLogin() {
+  var codeInput = document.getElementById('login-code');
+  var passInput = document.getElementById('login-password');
+  var code = codeInput.value.trim();
+  var password = passInput.value;
+  var errBox = document.getElementById('login-error');
+  var btn = document.getElementById('login-submit');
+
+  errBox.textContent = '';
+  errBox.classList.remove('show');
+
+  if (!code) {
+    errBox.textContent = 'Masukkan kode akses terlebih dahulu.';
+    errBox.classList.add('show');
+    codeInput.focus();
+    return;
+  }
+  if (!password) {
+    errBox.textContent = 'Masukkan password terlebih dahulu.';
+    errBox.classList.add('show');
+    passInput.focus();
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  google.script.run
+    .withSuccessHandler(function (res) {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      if (!res.ok) {
+        errBox.textContent = res.message || 'Kode atau password tidak dikenali.';
+        errBox.classList.add('show');
+        passInput.value = '';
+        passInput.focus();
+        return;
+      }
+      STATE.auth = { token: res.token, role: res.role, kode: res.kode, nama: res.nama };
+      try { sessionStorage.setItem('kda_auth', JSON.stringify(STATE.auth)); } catch (e) {}
+      loadData();
+    })
+    .withFailureHandler(function (err) {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      errBox.textContent = (err && err.message) || String(err);
+      errBox.classList.add('show');
+    })
+    .login(code, password);
+}
+
+function doLogout() {
+  var token = STATE.auth.token;
+  STATE.auth = { token: null, role: 'public', kode: null, nama: null };
+  STATE.pendingKab = null;
+  try { sessionStorage.removeItem('kda_auth'); } catch (e) {}
+  if (token) google.script.run.logout(token);
+  loadData();
+}
+/* =================== akhir Login =================== */
+
+/**
+ * Mengurutkan kabupaten/kota dari rata-rata progres TERTINGGI ke TERENDAH dan
+ * menandai peringkatnya (kab._rank, 1 = tertinggi). Dipakai di sidebar (admin)
+ * dan di panel Peringkat & Grafik Progres Kabupaten/Kota pada Ringkasan Provinsi.
+ */
+function getRankedKabupaten() {
+  var sorted = STATE.data.kabupaten.slice().sort(function (a, b) { return b.rataRata - a.rataRata; });
+  sorted.forEach(function (kab, i) { kab._rank = i + 1; });
+  return sorted;
+}
+
+function renderSidebar(filterText) {
+  var list = document.getElementById('kab-list');
+  list.innerHTML = '';
+  var showRank = STATE.data.role === 'admin';
+  var ranked = getRankedKabupaten();
+  ranked.forEach(function (kab) {
+    if (filterText && kab.nama.toLowerCase().indexOf(filterText) === -1) return;
+    var li = document.createElement('li');
+    li.className = (STATE.activeKab === kab.kode && STATE.view === 'detail') ? 'active' : '';
+    li.innerHTML = (showRank ? '<span class="kab-rank-no">#' + kab._rank + '</span>' : '') +
+      '<span class="kab-name">' + kab.nama + '</span>' +
+      '<span class="kab-pct" style="background:' + colorFor(kab.rataRata) + '">' + kab.rataRata + '%</span>';
+    li.onclick = function () { openKab(kab.kode); };
+    list.appendChild(li);
+  });
+}
+
+function setNav(which) {
+  document.getElementById('nav-overview').classList.toggle('active', which === 'overview');
+  document.getElementById('nav-filter').classList.toggle('active', which === 'filter');
+  document.getElementById('nav-riwayat').classList.toggle('active', which === 'riwayat');
+}
+
+function showOverview() {
+  STATE.view = 'overview';
+  setNav('overview');
+  renderSidebar();
+  renderOverviewLengkap(STATE.data.kabupaten);
+}
+
+/**
+ * Tampilan Ringkasan Provinsi: SELALU lengkap untuk semua orang (termasuk
+ * yang belum login) — kartu tiap kab/kota beserta peringkat kecamatan
+ * se-provinsi dan per kab/kota. Yang dibatasi untuk publik bukan konten ini,
+ * melainkan (a) daftar kab/kota di SIDEBAR (lihat updateSidebarChrome()), dan
+ * (b) akses ke detail checklist saat kab/kota diklik (lihat openKab()).
+ */
+function renderOverviewLengkap(kabs) {
+  var totalKec = kabs.reduce(function (s, k) { return s + k.totalKecamatan; }, 0);
+  var totalSelesai = kabs.reduce(function (s, k) { return s + k.selesai; }, 0);
+  var totalBelum = kabs.reduce(function (s, k) { return s + k.belumMulai; }, 0);
+  var rataProv = kabs.length ? Math.round((kabs.reduce(function (s, k) { return s + k.rataRata; }, 0) / kabs.length) * 100) / 100 : 0;
+
+  var html = '<h2>Ringkasan Provinsi</h2>' +
+    '<div class="meta">Progres keseluruhan monitoring publikasi Kecamatan Dalam Angka ' + STATE.data.year + '</div>';
+
+  html += '<div class="cards-row">' +
+    statCard(rataProv + '%', 'Rata-rata Progres Provinsi', 'var(--blue-500)') +
+    statCard(totalSelesai + ' / ' + totalKec, 'Kecamatan Selesai (100%)', 'var(--green)') +
+    statCard(totalBelum, 'Kecamatan Belum Mulai', 'var(--red)') +
+    statCard(kabs.length, 'Jumlah Kab/Kota', 'var(--navy-800)') +
+    '</div>';
+
+  html += '<div class="kab-grid">';
+  kabs.slice().sort(function (a, b) { return a.rataRata - b.rataRata; }).forEach(function (kab) {
+    html += '<div class="kab-card" style="border-left:4px solid ' + colorFor(kab.rataRata) + '" onclick="openKab(\'' + kab.kode + '\')">' +
+      '<div class="name">' + kab.nama + '</div>' +
+      '<div class="bar-bg"><div class="bar-fill" style="width:' + kab.rataRata + '%;background:' + colorFor(kab.rataRata) + '"></div></div>' +
+      '<div class="foot"><span>' + kab.selesai + '/' + kab.totalKecamatan + ' kecamatan selesai</span><span>' + kab.rataRata + '%</span></div>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  // ===== Peringkat & grafik progres per kabupaten/kota =====
+  html += '<h2 style="margin-top:28px;">Peringkat &amp; Grafik Progres Kabupaten/Kota</h2>' +
+    '<div class="meta">Seluruh kab/kota diurutkan dari rata-rata progres tertinggi ke terendah &mdash; klik salah satu untuk buka rinciannya</div>';
+  var kabChartItems = kabs.slice().sort(function (a, b) { return b.rataRata - a.rataRata; }).map(function (kab) {
+    return { label: kab.nama, pct: kab.rataRata, onClickAttr: "openKab('" + kab.kode + "')" };
+  });
+  html += '<div class="kec-panel">' + renderBarChart(kabChartItems, { showRank: true }) + '</div>';
+
+  // ===== 10 kecamatan progres tertinggi & terendah se-provinsi =====
+  var flat = getAllKecamatanFlat();
+  var flatSortedAsc = flat.slice().sort(function (a, b) { return a.progres - b.progres; });
+  var top10 = flatSortedAsc.slice(-10).reverse();
+  var bottom10 = flatSortedAsc.slice(0, 10);
+
+  html += '<h2 style="margin-top:28px;">Peringkat Kecamatan Se-Provinsi</h2>' +
+    '<div class="meta">10 kecamatan dengan progres tertinggi dan terendah di seluruh provinsi</div>';
+  html += '<div class="rank-cols">' +
+    '<div class="rank-col">' + renderRankPanel('🏆 10 Progres Tertinggi', top10, true) + '</div>' +
+    '<div class="rank-col">' + renderRankPanel('⚠️ 10 Progres Terendah', bottom10, true) + '</div>' +
+    '</div>';
+
+  // ===== 5 kecamatan progres tertinggi & terendah per kab/kota =====
+  html += '<h2 style="margin-top:28px;">Peringkat Kecamatan per Kab/Kota</h2>' +
+    '<div class="meta">5 kecamatan tertinggi dan terendah di masing-masing kab/kota &mdash; klik nama kab/kota untuk buka rinciannya</div>';
+  html += '<div class="kab-rank-list">';
+  kabs.slice().sort(function (a, b) { return Number(a.kode) - Number(b.kode); }).forEach(function (kab) {
+    var kecSorted = kab.kecamatan.slice().sort(function (a, b) { return b.progres - a.progres; });
+    var top5 = kecSorted.slice(0, 5);
+    var bottom5 = kecSorted.slice(-5).reverse();
+    html += '<details class="kab-rank-item">' +
+      '<summary>' + kab.nama +
+      '<span class="rank-pct-inline" style="background:' + colorFor(kab.rataRata) + '">' + kab.rataRata + '%</span>' +
+      '</summary>' +
+      '<div class="rank-cols">' +
+        '<div class="rank-col"><div class="rank-subtitle">Tertinggi</div>' + renderRankPanel(null, top5.map(withKab(kab)), false) + '</div>' +
+        '<div class="rank-col"><div class="rank-subtitle">Terendah</div>' + renderRankPanel(null, bottom5.map(withKab(kab)), false) + '</div>' +
+      '</div>' +
+      '</details>';
+  });
+  html += '</div>';
+
+  document.getElementById('main').innerHTML = html;
+}
+
+function getAllKecamatanFlat() {
+  var flat = [];
+  STATE.data.kabupaten.forEach(function (kab) {
+    kab.kecamatan.forEach(function (kec) {
+      flat.push({ kabNama: kab.nama, kabKode: kab.kode, nama: kec.nama, progres: kec.progres, row: kec.row });
+    });
+  });
+  return flat;
+}
+
+function withKab(kab) {
+  return function (kec) {
+    return { kabNama: kab.nama, kabKode: kab.kode, nama: kec.nama, progres: kec.progres, row: kec.row };
+  };
+}
+
+/**
+ * Render daftar ranking kecamatan. Jika title diisi, dibungkus dalam kec-panel
+ * lengkap dengan judul (dipakai untuk ranking se-provinsi). Jika title null,
+ * hanya daftar polos (dipakai di dalam accordion per kab/kota).
+ * showKab: tampilkan nama kab/kota di tiap baris atau tidak.
+ */
+function renderRankPanel(title, items, showKab) {
+  var body;
+  if (!items.length) {
+    body = '<div class="meta" style="margin:0;">Tidak ada data.</div>';
+  } else {
+    body = '<div class="rank-list">' + items.map(function (it, i) {
+      return '<div class="rank-item" onclick="openKab(\'' + it.kabKode + '\',' + it.row + ')">' +
+        '<span class="rank-no">' + (i + 1) + '</span>' +
+        '<span class="rank-name">' + it.nama + (showKab ? ' <span class="rank-kab">(' + it.kabNama + ')</span>' : '') + '</span>' +
+        '<span class="rank-pct" style="background:' + colorFor(it.progres) + '">' + it.progres + '%</span>' +
+        '</div>';
+    }).join('') + '</div>';
+  }
+
+  if (!title) return body;
+  return '<div class="kec-panel"><div class="head"><h3>' + title + '</h3></div>' + body + '</div>';
+}
+
+function statCard(num, lbl, accent) {
+  var bar = accent ? '<span class="stat-accent" style="background:' + accent + '"></span>' : '';
+  return '<div class="stat-card">' + bar + '<div class="num">' + num + '</div><div class="lbl">' + lbl + '</div></div>';
+}
+
+/**
+ * Grafik batang horizontal sederhana (tanpa library eksternal) untuk menampilkan
+ * progres beberapa item sekaligus (kab/kota atau kecamatan), diurutkan sesuai
+ * urutan array items (chart ini tidak mengurutkan ulang datanya).
+ * items: [{ label, pct, onClickAttr? }]. opts.showRank: true untuk menampilkan
+ * nomor urut di depan tiap baris (dipakai di Ringkasan Provinsi).
+ */
+function renderBarChart(items, opts) {
+  opts = opts || {};
+  if (!items.length) return '<div class="meta" style="margin:0;">Tidak ada data.</div>';
+  var showRank = !!opts.showRank;
+  return '<div class="barchart">' + items.map(function (it, i) {
+    var clickable = !!it.onClickAttr;
+    return '<div class="barchart-row' + (clickable ? ' clickable' : '') + '"' +
+      (clickable ? ' onclick="' + it.onClickAttr + '"' : '') + '>' +
+      (showRank ? '<span class="barchart-rank">' + (i + 1) + '</span>' : '') +
+      '<span class="barchart-label" title="' + it.label + '">' + it.label + '</span>' +
+      '<div class="barchart-track"><div class="barchart-fill" style="width:' + Math.max(it.pct, 2) + '%;background:' + colorFor(it.pct) + '"></div></div>' +
+      '<span class="barchart-value">' + it.pct + '%</span>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+/* ===================== Cari Kecamatan =====================
+   Alur baru: pilih Kabupaten/Kota dulu dari dropdown, baru muncul
+   insight kab tsb dan kotak pencarian kecamatan yang ruang lingkupnya
+   dibatasi ke kab/kota yang dipilih saja (bukan pencarian global). */
+function showFilter() {
+  if (STATE.data.role === 'public') { showLogin(); return; }
+
+  STATE.view = 'filter';
+  FILTER_STATE.kode = null;
+  setNav('filter');
+  renderSidebar();
+
+  var isKabkota = STATE.data.role === 'kabkota';
+  var html = '<h2>Cari Kecamatan</h2>';
+
+  if (isKabkota) {
+    var namaWilayah = STATE.data.kabupaten.length ? STATE.data.kabupaten[0].nama : STATE.data.nama;
+    html += '<div class="meta">Cari kecamatan di wilayah ' + namaWilayah + '</div>';
+  } else {
+    html += '<div class="meta">Pilih kabupaten/kota terlebih dahulu, baru cari kecamatan di dalamnya</div>';
+    html += '<div id="filter-box"><select id="filter-kab-select" onchange="onFilterKabChange(this.value)">';
+    html += '<option value="">-- Pilih Kabupaten/Kota --</option>';
+    STATE.data.kabupaten.slice().sort(function (a, b) { return Number(a.kode) - Number(b.kode); }).forEach(function (kab) {
+      html += '<option value="' + kab.kode + '">' + kab.nama + '</option>';
+    });
+    html += '</select></div>';
+  }
+
+  html += '<div id="filter-insight"></div>';
+  html += '<div id="filter-kec-search-box" style="display:none;margin-bottom:14px;">' +
+    '<input id="kec-search" placeholder="Cari kecamatan di kab/kota ini..." oninput="runFilter(this.value)"></div>';
+  html += '<div id="filter-results"></div>';
+
+  document.getElementById('main').innerHTML = html;
+
+  if (isKabkota && STATE.data.kabupaten.length) {
+    onFilterKabChange(STATE.data.kabupaten[0].kode);
+  }
+}
+
+function onFilterKabChange(kode) {
+  FILTER_STATE.kode = kode || null;
+  var insightBox = document.getElementById('filter-insight');
+  var searchBox = document.getElementById('filter-kec-search-box');
+  var resultsBox = document.getElementById('filter-results');
+
+  if (!kode) {
+    insightBox.innerHTML = '';
+    searchBox.style.display = 'none';
+    resultsBox.innerHTML = '';
+    return;
+  }
+
+  var kab = STATE.data.kabupaten.find(function (k) { return k.kode === kode; });
+  if (!kab) return;
+
+  // Insight: aspek apa yang paling sering belum terisi di kab/kota ini
+  var aspekCount = STATE.data.aspects.map(function (label) { return { label: label, done: 0 }; });
+  kab.kecamatan.forEach(function (kec) {
+    kec.aspek.forEach(function (a, idx) { if (a.filled) aspekCount[idx].done++; });
+  });
+  aspekCount.sort(function (a, b) { return a.done - b.done; });
+
+  var html = '<div class="cards-row">' +
+    statCard(kab.rataRata + '%', 'Rata-rata Progres', 'var(--blue-500)') +
+    statCard(kab.selesai + ' / ' + kab.totalKecamatan, 'Kecamatan Selesai', 'var(--green)') +
+    statCard(kab.proses, 'Sedang Proses', 'var(--yellow)') +
+    statCard(kab.belumMulai, 'Belum Mulai', 'var(--red)') +
+    '</div>';
+
+  html += '<div class="kec-panel" style="margin-bottom:16px;">' +
+    '<div class="head"><h3>Aspek Paling Sering Tertinggal &mdash; ' + kab.nama + '</h3></div>' +
+    '<div class="aspek-grid">';
+  aspekCount.slice(0, 5).forEach(function (a) {
+    var pct = kab.totalKecamatan ? Math.round((a.done / kab.totalKecamatan) * 100) : 0;
+    html += '<div class="aspek-item" style="cursor:default;">' +
+      '<span class="lbl">' + a.label + '</span>' +
+      '<span class="date">Terisi di ' + a.done + '/' + kab.totalKecamatan + ' kecamatan (' + pct + '%)</span>' +
+      '</div>';
+  });
+  html += '</div></div>';
+
+  insightBox.innerHTML = html;
+  searchBox.style.display = 'block';
+  document.getElementById('kec-search').value = '';
+  runFilter('');
+}
+
+function runFilter(q) {
+  var box = document.getElementById('filter-results');
+  if (!FILTER_STATE.kode) { box.innerHTML = ''; return; }
+
+  var kab = STATE.data.kabupaten.find(function (k) { return k.kode === FILTER_STATE.kode; });
+  if (!kab) { box.innerHTML = ''; return; }
+
+  q = (q || '').toLowerCase().trim();
+  var list = kab.kecamatan
+    .filter(function (kec) { return !q || kec.nama.toLowerCase().indexOf(q) !== -1; })
+    .slice()
+    .sort(function (a, b) { return a.progres - b.progres; });
+
+  if (!list.length) { box.innerHTML = '<div class="meta">Tidak ditemukan.</div>'; return; }
+
+  box.innerHTML = list.map(function (kec) {
+    return '<div class="filter-result" onclick="openKab(\'' + kab.kode + '\',' + kec.row + ')">' +
+      '<div><b>' + kec.nama + '</b> &mdash; ' + kec.progres + '%</div>' +
+      '<div class="kab">' + (kec.missing.length ? 'Kurang: ' + kec.missing.join(', ') : 'Lengkap') + '</div>' +
+      '</div>';
+  }).join('');
+}
+/* =================== akhir Cari Kecamatan =================== */
+
+/* ===================== Riwayat Aktivitas =====================
+   Menampilkan, per tanggal, kecamatan mana saja yang dikerjakan dan aspek
+   apa saja yang diselesaikan pada tanggal tsb. Role kabkota hanya melihat
+   riwayat wilayahnya sendiri; role admin (provinsi) bisa melihat riwayat
+   seluruh kab/kota sekaligus, atau difilter ke satu kab/kota lewat dropdown. */
+function showRiwayat() {
+  if (STATE.data.role === 'public') { showLogin(); return; }
+
+  STATE.view = 'riwayat';
+  RIWAYAT_STATE.kode = 'all';
+  setNav('riwayat');
+  renderSidebar();
+
+  var isKabkota = STATE.data.role === 'kabkota';
+  var html = '<h2>Riwayat Aktivitas</h2>';
+
+  if (isKabkota) {
+    var namaWilayah = STATE.data.kabupaten.length ? STATE.data.kabupaten[0].nama : STATE.data.nama;
+    html += '<div class="meta">Riwayat apa saja yang sudah dikerjakan di wilayah ' + namaWilayah + ', dikelompokkan per tanggal</div>';
+  } else {
+    html += '<div class="meta">Riwayat apa saja yang sudah dikerjakan di seluruh kab/kota, dikelompokkan per tanggal. Pilih satu kab/kota untuk mempersempit tampilan.</div>';
+    html += '<div id="filter-box"><select id="riwayat-kab-select" onchange="onRiwayatKabChange(this.value)">';
+    html += '<option value="all">-- Semua Kab/Kota --</option>';
+    STATE.data.kabupaten.slice().sort(function (a, b) { return Number(a.kode) - Number(b.kode); }).forEach(function (kab) {
+      html += '<option value="' + kab.kode + '">' + kab.nama + '</option>';
+    });
+    html += '</select></div>';
+  }
+
+  html += '<div id="riwayat-search-box" style="margin:14px 0;"><input id="riwayat-search" placeholder="Cari nama kecamatan..." oninput="renderRiwayatBody()"></div>';
+  html += '<div id="riwayat-body"></div>';
+
+  document.getElementById('main').innerHTML = html;
+  renderRiwayatBody();
+}
+
+function onRiwayatKabChange(kode) {
+  RIWAYAT_STATE.kode = kode || 'all';
+  renderRiwayatBody();
+}
+
+function renderRiwayatBody() {
+  var body = document.getElementById('riwayat-body');
+  if (!body) return;
+
+  var isKabkota = STATE.data.role === 'kabkota';
+  var showKabName = !isKabkota && RIWAYAT_STATE.kode === 'all';
+
+  var kabSources = STATE.data.kabupaten;
+  if (!isKabkota && RIWAYAT_STATE.kode !== 'all') {
+    kabSources = kabSources.filter(function (k) { return k.kode === RIWAYAT_STATE.kode; });
+  }
+
+  var entries = [];
+  kabSources.forEach(function (kab) {
+    (kab.riwayat || []).forEach(function (r) {
+      entries.push({
+        tanggal: r.tanggal,
+        tanggalDisplay: r.tanggalDisplay,
+        jam: r.jam,
+        kecamatan: r.kecamatan,
+        kecamatanRow: r.kecamatanRow,
+        aspek: r.aspek,
+        kabNama: kab.nama,
+        kabKode: kab.kode
+      });
+    });
+  });
+
+  var searchInput = document.getElementById('riwayat-search');
+  var q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  if (q) {
+    entries = entries.filter(function (e) {
+      return e.kecamatan.toLowerCase().indexOf(q) !== -1 || (showKabName && e.kabNama.toLowerCase().indexOf(q) !== -1);
+    });
+  }
+
+  entries.sort(function (a, b) {
+    if (a.tanggal !== b.tanggal) return a.tanggal < b.tanggal ? 1 : -1;
+    return (b.jam || '').localeCompare(a.jam || '');
+  });
+
+  if (!entries.length) {
+    body.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><h3>Belum ada riwayat</h3>' +
+      '<p>Belum ada aspek yang tercatat tanggal pengerjaannya' + (q ? ' untuk pencarian ini' : '') + '.</p></div>';
+    return;
+  }
+
+  // Kelompokkan entri per tanggal, lalu per kecamatan (supaya beberapa aspek yang
+  // selesai di kecamatan & tanggal yang sama digabung jadi satu baris).
+  var dateGroups = [];
+  var dateIndex = {};
+  entries.forEach(function (e) {
+    if (!(e.tanggal in dateIndex)) {
+      dateIndex[e.tanggal] = dateGroups.length;
+      dateGroups.push({ tanggal: e.tanggal, tanggalDisplay: e.tanggalDisplay, kecGroups: [], kecIndex: {} });
+    }
+    var dg = dateGroups[dateIndex[e.tanggal]];
+    var kecKey = e.kabKode + '|' + e.kecamatanRow;
+    if (!(kecKey in dg.kecIndex)) {
+      dg.kecIndex[kecKey] = dg.kecGroups.length;
+      dg.kecGroups.push({ kecamatan: e.kecamatan, kecamatanRow: e.kecamatanRow, kabNama: e.kabNama, kabKode: e.kabKode, aspekList: [] });
+    }
+    dg.kecGroups[dg.kecIndex[kecKey]].aspekList.push({ aspek: e.aspek, jam: e.jam });
+  });
+
+  var html = '';
+  dateGroups.forEach(function (dg) {
+    var totalAspekHariIni = dg.kecGroups.reduce(function (s, kg) { return s + kg.aspekList.length; }, 0);
+    html += '<div class="riwayat-date-group">' +
+      '<div class="riwayat-date-head"><span>' + dg.tanggalDisplay + '</span>' +
+      '<span class="riwayat-date-count">' + totalAspekHariIni + ' aspek &middot; ' + dg.kecGroups.length + ' kecamatan</span></div>' +
+      '<div class="riwayat-kec-list">';
+    dg.kecGroups.forEach(function (kg) {
+      var jamPunya = kg.aspekList.filter(function (a) { return a.jam; }).map(function (a) { return a.jam; });
+      var jamLabel = jamPunya.length ? jamPunya[0] : '';
+      html += '<div class="riwayat-item" onclick="openKab(\'' + kg.kabKode + '\',' + kg.kecamatanRow + ')">' +
+        '<div class="riwayat-item-head">' +
+          '<span class="riwayat-kec-name">' + kg.kecamatan + (showKabName ? ' <span class="riwayat-kab-tag">&middot; ' + kg.kabNama + '</span>' : '') + '</span>' +
+          '<span class="riwayat-jam">' + jamLabel + '</span>' +
+        '</div>' +
+        '<div class="riwayat-aspek-tags">' +
+          kg.aspekList.map(function (a) { return '<span class="riwayat-aspek-tag">' + a.aspek + '</span>'; }).join('') +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  body.innerHTML = html;
+}
+/* =================== akhir Riwayat Aktivitas =================== */
+
+function openKab(kode, kecRow) {
+  if (STATE.data.role === 'public') {
+    STATE.pendingKab = { kode: kode, row: kecRow || null };
+    showLogin('Login diperlukan untuk melihat detail dan checklist kabupaten/kota ini.');
+    return;
+  }
+
+  STATE.view = 'detail';
+  STATE.activeKab = kode;
+  setNav('');
+  renderSidebar();
+  var kab = STATE.data.kabupaten.find(function (k) { return k.kode === kode; });
+  if (!kab) return;
+
+  STATE.activeKecRow = kecRow || (kab.kecamatan[0] ? kab.kecamatan[0].row : null);
+  renderKabDetail(kab);
+}
+
+function renderKabDetail(kab) {
+  var html = '<h2>' + kab.nama + '</h2>' +
+    '<div class="meta">' + kab.selesai + ' dari ' + kab.totalKecamatan + ' kecamatan selesai &bull; rata-rata ' + kab.rataRata + '%</div>';
+
+  var chartItems = kab.kecamatan.slice().sort(function (a, b) { return b.progres - a.progres; }).map(function (kec) {
+    return { label: kec.nama, pct: kec.progres, onClickAttr: "selectKec('" + kab.kode + "'," + kec.row + ")" };
+  });
+  html += '<div class="kec-panel" style="margin-bottom:16px;">' +
+    '<div class="head"><h3>Grafik Progres Kecamatan</h3></div>' +
+    renderBarChart(chartItems, { showRank: false }) +
+    '</div>';
+
+  html += '<div class="tabs">';
+  kab.kecamatan.forEach(function (kec) {
+    var active = kec.row === STATE.activeKecRow ? ' active' : '';
+    html += '<div class="tab-btn' + active + '" onclick="selectKec(\'' + kab.kode + '\',' + kec.row + ')">' +
+      '<span class="dot" style="background:' + colorFor(kec.progres) + '"></span>' + kec.nama + '</div>';
+  });
+  html += '</div>';
+
+  html += '<div id="kec-panel"></div>';
+  document.getElementById('main').innerHTML = html;
+  renderKecPanel(kab);
+}
+
+function selectKec(kode, row) {
+  STATE.activeKecRow = row;
+  var kab = STATE.data.kabupaten.find(function (k) { return k.kode === kode; });
+  renderKabDetail(kab);
+}
+
+function renderKecPanel(kab) {
+  var kec = kab.kecamatan.find(function (k) { return k.row === STATE.activeKecRow; });
+  var panel = document.getElementById('kec-panel');
+  if (!kec) { panel.innerHTML = ''; return; }
+
+  var html = '<div class="kec-panel">' +
+    '<div class="head"><h3>' + kec.namaLengkap + '</h3>' +
+    '<span class="progres-badge" style="background:' + colorFor(kec.progres) + '">' + kec.progres + '%</span></div>';
+
+  html += '<div class="aspek-grid">';
+  kec.aspek.forEach(function (a, idx) {
+    if (a.isDate) {
+      html += '<div class="aspek-item ' + (a.filled ? 'done' : '') + '" style="flex-direction:column;align-items:stretch;cursor:default;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+        '<span class="lbl">' + a.label + '</span>' +
+        '<input type="date" class="aspek-date-input" value="' + (a.rawDate || '') + '" ' +
+        'onchange="setTanggal(\'' + kab.sheetName + '\',' + kec.row + ',' + idx + ',this.value)">' +
+        '</div>' +
+        (a.filled ? '<span class="date" style="margin-top:4px;">' + a.value + '</span>' : '') +
+        '</div>';
+    } else {
+      html += '<label class="aspek-item ' + (a.filled ? 'done' : '') + '">' +
+        '<input type="checkbox" ' + (a.filled ? 'checked' : '') + ' onchange="toggle(\'' + kab.sheetName + '\',' + kec.row + ',' + idx + ',this.checked)">' +
+        '<span><span class="lbl">' + a.label + '</span>' + (a.filled ? '<span class="date">' + a.value + '</span>' : '') + '</span>' +
+        '</label>';
+    }
+  });
+  html += '</div>';
+
+  if (kec.missing.length) {
+    html += '<div class="missing-box"><b>Belum lengkap (' + kec.missing.length + '):</b> ' + kec.missing.join(', ') + '</div>';
+  } else {
+    html += '<div class="missing-box empty"><b>Lengkap</b> &mdash; semua aspek sudah terisi.</div>';
+  }
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function toggle(sheetName, row, aspectIndex, checked) {
+  google.script.run.withSuccessHandler(function (updatedKab) {
+    var idx = STATE.data.kabupaten.findIndex(function (k) { return k.sheetName === sheetName; });
+    if (idx !== -1) STATE.data.kabupaten[idx] = updatedKab;
+    renderSidebar(document.getElementById('sidebar-search') ? document.getElementById('sidebar-search').value.toLowerCase() : '');
+    renderKabDetail(updatedKab);
+  }).withFailureHandler(onError).toggleAspek(STATE.auth.token, sheetName, row, aspectIndex, checked);
+}
+
+function setTanggal(sheetName, row, aspectIndex, value) {
+  google.script.run.withSuccessHandler(function (updatedKab) {
+    var idx = STATE.data.kabupaten.findIndex(function (k) { return k.sheetName === sheetName; });
+    if (idx !== -1) STATE.data.kabupaten[idx] = updatedKab;
+    renderSidebar(document.getElementById('sidebar-search') ? document.getElementById('sidebar-search').value.toLowerCase() : '');
+    renderKabDetail(updatedKab);
+  }).withFailureHandler(onError).setAspekTanggal(STATE.auth.token, sheetName, row, aspectIndex, value);
+}
+
+init();
+</script>
+</body>
+</html>
